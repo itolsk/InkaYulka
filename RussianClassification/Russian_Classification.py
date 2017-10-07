@@ -50,8 +50,8 @@ def features(input_string, word_features):
 
 words=set(before)
 labeled_names=zip(before,classes)
-features = [features(n, words) for n in before]
-featuresets = list(zip(features, classes))
+features_n = [features(n, words) for n in before]
+featuresets = list(zip(features_n, classes))
 train_set, test_set = featuresets[4500:], featuresets[:500]
 
 classifier = nltk.NaiveBayesClassifier.train(train_set)
