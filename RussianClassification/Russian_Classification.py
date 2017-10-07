@@ -1,21 +1,15 @@
 import numpy as np
 import pandas as pd
 import csv
-import os.path
 import string
 import nltk
-import collections
-from collections import Counter
-from collections import namedtuple
 from nltk.corpus import names
-import unidecode
 from unidecode import unidecode
-import random
 
 df = pd.read_csv('/Users/ito022/Downloads/ru_train.csv', delimiter=',', lineterminator='\n', error_bad_lines=False, low_memory=False, encoding = 'utf8',  names=['sentence_id', 'token_id', 'class', 'before', 'after'])
 
-classes=df['class'].dropna().tolist()
-
+classes=df['class'].tolist()
+before=df['before'].tolist()
 classes_set= set(classes)
 #Out[63]: 
 #{'CARDINAL',
@@ -34,34 +28,34 @@ classes_set= set(classes)
 # 'TIME',
 # 'VERBATIM',
 
-
-#def features(input_string):
- #   features = {}
-  #  features['contains numbers']=any(char.isdigit() for char in input_string)
-   # features['contains punctuation']=any(char in string.punctuation for char in input_string) 
-    #features['number']=''.join[char for char in input_string.split() if char.isdigit()]
-    #features['length'] = len(input_string))
-    #return features
-
-def features(input_string, word_features): 
+def features(input_string, word_features):
     features = {}
-    for word in word_features:
-        features['contains({})'.format(str(word).encode('utf-8'))] = (str(word).encode('utf-8') in input_string)
-    features['contains numbers']=any(char.isdigit() for char in input_string)
-    features['contains punctuation']=any(char in string.punctuation for char in input_string) 
-    #features['number']=''.join[char for char in input_string.split() if char.isdigit()]
-    features['length'] = len(input_string) 
+    features['is float']=isinstance(input_string, float)
+    features['contains roman numbers']=isinstance(input_string, str) and all((c in ('IVXLNM')) for c in input_string)
+    features['contains dates']=isinstance(input_string, str) and any((c in ('год','январ','феврал', 'март','апрел','мая','июн','июл','август','сентябр','октябр','ноябр', 'декабр')) for c in input_string)
+    features['contains year']=isinstance(input_string, float) and (input_string<3000)and (input_string>1000)
+    features['contains numbers']=isinstance(input_string, str) and any(char.isdigit() for char in input_string)
+    features['contains /']=isinstance(input_string, str) and '/' in input_string
+    features['contains punctuation']=isinstance(input_string, str) and any(char in string.punctuation for char in input_string)
+    #features['number']=''.join[char for char in input_string.split() if char.isdigit()]                                                                                                                                                                                                                                  
+    features['short'] = isinstance(input_string, str) and len(input_string)<4
+    features['contains capital latin']=isinstance(input_string, str) and re.search('[A-Z]', input_string)
+    features['contains lowercase latin']=isinstance(input_string, str) and re.search('[a-z]', input_string)
+    features['contains upper']=isinstance(input_string, str) and any(c.isupper() for c in input_string)    
+    features['contains lower']=isinstance(input_string, str) and any(c.islower() for c in input_string) 
+    features['contains measures']=isinstance(input_string, str) and any((c in ('st', 'мин', 'с.', 'км', 'см', '%','метр','л.','В','гб','гр','грам','кило','га', 'тыс','ярд','А','мм','В', 'тонн')) for c in input_string) and any(char.isdigit() for char in input_string)
+    features['contains endings']=isinstance(input_string, str) and any((c in ('-го', '-ом','-й','-е','-я','-и','-х', '—')) for c in input_string)
+    
     return features
 
-words=set(df['before'])
-subset = df[['before', 'class']]
-labeled_names = [(x, cl) for x, cl in subset.values]
-random.shuffle(labeled_names)
-featuresets = [(features(n, words), cl) for (n, cl) in labeled_names]
-train_set, test_set = featuresets[3000:], featuresets[:3000]
+words=set(before)
+labeled_names=zip(before,classes)
+features = [features(n, words) for n in before]
+featuresets = list(zip(features, classes))
+train_set, test_set = featuresets[4500:], featuresets[:500]
+
 classifier = nltk.NaiveBayesClassifier.train(train_set)
 
-
-
-
 print('classifier accuracy', nltk.classify.accuracy(classifier, test_set))
+
+classifier.show_most_informative_features(25)
