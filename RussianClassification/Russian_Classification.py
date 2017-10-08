@@ -99,6 +99,13 @@ words = "ноль один два три четыре пять шесть сем
 words = words.split(" ")
 
 def number2words(n):
+    if isinstance(n, str) and all((c in ('IVXLCDM')) for c in n):
+        n=roman(n)
+        try:
+            n=int(n)
+        except ValueError:
+            print(n)
+            return(n)
     if n < 20:
         return words[n]
     elif n < 100:
@@ -127,3 +134,19 @@ def ordinal2words(n):
         return  "тысяча" + (' ' + ordinal2words(n % 1000) if n % 1000 > 0 else '')
     elif n < 3000:
         return  "две тысячи" + (' ' + ordinal2words(n % 1000) if n % 1000 > 0 else '')
+
+
+def roman(n):
+    roman_dict = {u"M":1000, u"D":500, u"C":100, u"L":50, 
+       u"X":10, u"V":5, u"I":1 }
+    held=0
+    result=0
+    for c in n:
+        val=roman_dict[c]
+        if val>held:
+            result-=held
+        else:
+            result+=held
+        held=val
+    result+=held    
+    return(result)  
