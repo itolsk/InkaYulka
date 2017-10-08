@@ -88,3 +88,22 @@ for (name, tag) in devtest_names:
 
 for (tag, guess, name) in sorted(errors):
     print('correct={:<8} guess={:<8s} name={:<30}'.format(tag, guess, name))
+
+
+
+words = "ноль один два три четыре пять шесть семь восемь девять десять одинадцать двенадцать" + \
+" тринадцать четырнадцать пятнадцать шестнадцать семнадцать восемнадцать девятнадцать двадцать" + \
+" тридцать сорок пятьдесят шестьдесят семьдесят восемьдесят девяносто" + \
+" сто двести триста четыреста пятьсот шестьсот семьсот восемьсот девятьсот"
+
+words = words.split(" ")
+
+def number2words(n):
+    if n < 20:
+        return words[n]
+    elif n < 100:
+        return words[18 + n // 10] + ('' if n % 10 == 0 else ' ' + words[n % 10])
+    elif n < 1000:
+        return (words[27 + n // 100]) + (' ' + number2words(n % 100) if n % 100 > 0 else '')
+    elif n < 1000000:
+        return  "тысяча" + (' ' + number2words(n % 1000) if n % 1000 > 0 else '')
