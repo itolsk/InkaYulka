@@ -107,3 +107,23 @@ def number2words(n):
         return (words[27 + n // 100]) + (' ' + number2words(n % 100) if n % 100 > 0 else '')
     elif n < 1000000:
         return  "тысяча" + (' ' + number2words(n % 1000) if n % 1000 > 0 else '')
+
+
+ordinal_words = "ноль первый второй третий четвертый пятый шестой седьмой восьмой девятый десятый одинадцатый двенадцатый" + \
+" тринадцатый четырнадцатый пятнадцатый шестнадцатый семнадцатый восемнадцатый девятнадцатый двадцатый" + \
+" тридцатый сороковой пятидесятый шестидесятый семидесятый восьмидесятый девяностый" + \
+" сотый двухсотый трехсотый четырехсотый пятисотый шестисотый семисотый восьмисотый девятисотый"
+
+ordinal_words = ordinal_words.split(" ")
+
+def ordinal2words(n):
+    if n < 20:
+        return ordinal_words[n]
+    elif n < 100:
+        return (words[18 + n // 10] + ('' if n % 10 == 0 else ' ' + ordinal_words[n % 10]) if n % 10 > 0 else ordinal_words[18 + n // 10])
+    elif n < 1000:
+        return ((words[27 + n // 100]) + (' ' + ordinal2words(n % 100)) if n % 100 > 0 else ordinal_words[27 + n // 100])
+    elif n < 2000:
+        return  "тысяча" + (' ' + ordinal2words(n % 1000) if n % 1000 > 0 else '')
+    elif n < 3000:
+        return  "две тысячи" + (' ' + ordinal2words(n % 1000) if n % 1000 > 0 else '')
